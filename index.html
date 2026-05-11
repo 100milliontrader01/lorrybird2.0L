@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorry Bird Tax Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        mono: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        ghana: {
+                            red: '#CE1126',
+                            yellow: '#FCD116',
+                            green: '#006B3F',
+                            black: '#000000'
+                        },
+                        slate: {
+                            850: '#151f32',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style id="dynamic-print-style">
+        @media print { 
+            @page { margin: 0; size: A4; } 
+            body { padding: 1.5cm !important; }
+        }
+    </style>
+
+    <style>
+        .form-input { transition: all 0.2s; }
+        .form-input:focus { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 20px; width: 20px;
+            border-radius: 50%; background: #2563eb; cursor: pointer;
+            margin-top: -8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); border: 2px solid white;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer;
+            background: #e2e8f0; border-radius: 2px;
+        }
+
+        .bg-pattern {
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; font-size: 11pt; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
+            .print-header-row { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border-bottom: 1px solid #ddd; padding: 8px 0; }
+            tfoot { border-top: 2px solid #000; }
+            .shadow-xl, .shadow-lg, .shadow-sm { box-shadow: none !important; }
+            .bg-slate-900 { background-color: transparent !important; color: black !important; border: 1px solid #000; }
+            .text-white { color: black !important; }
+            .bg-gray-50 { background-color: white !important; }
+            #lock-screen { display: none !important; }
+        }
+        .print-only { display: none; }
+
+        /* ── Lock Screen ── */
+        #lock-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #lock-screen .lock-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 1.25rem;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+        }
+
+        #lock-screen .stripe-bar {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        #lock-screen .stripe-bar span {
+            display: block;
+            width: 10px;
+            height: 32px;
+            border-radius: 4px;
+        }
+
+        #lock-screen input[type="password"] {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0.6rem;
+            padding: 0.85rem 1rem;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            text-align: center;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+        #lock-screen input[type="password"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+        #lock-screen input[type="password"].error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.2);
+            animation: shake 0.3s ease;
+        }
+
+        #lock-screen button.unlock-btn {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 0.6rem;
+            padding: 0.85rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        #lock-screen button.unlock-btn:hover { background: #1d4ed8; }
+        #lock-screen button.unlock-btn:active { transform: scale(0.98); }
+
+        #lock-error {
+            color: #f87171;
+            font-size: 0.8rem;
+            margin-top: 0.75rem;
+            min-height: 1.2rem;
+        }
+
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-slate-800 font-sans min-h-screen flex flex-col bg-pattern">
+
+    <!-- ══════════════════════════════════════
+         LOCK SCREEN
+         To change the password each month,
+         update the value of MONTHLY_PASSWORD below.
+    ══════════════════════════════════════ -->
+    <div id="lock-screen">
+        <div class="lock-card">
+            <!-- Ghana flag stripes -->
+            <div class="stripe-bar">
+                <span style="background:#CE1126"></span>
+                <span style="background:#FCD116"></span>
+                <span style="background:#006B3F"></span>
+            </div>
+
+            <div style="color:#94a3b8; font-size:2.5rem; margin-bottom:0.5rem;">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+
+            <h1 style="color:white; font-size:1.25rem; font-weight:700; margin-bottom:0.25rem;">
+                Lorry Bird Calculator
+            </h1>
+            <p style="color:#64748b; font-size:0.82rem; margin-bottom:1.75rem;">
+                Enter your monthly access code to continue
+            </p>
+
+            <input
+                type="password"
+                id="lock-input"
+                placeholder="Access code"
+                onkeydown="if(event.key==='Enter') attemptUnlock()"
+                autocomplete="off"
+            />
+
+            <button class="unlock-btn" onclick="attemptUnlock()">
+                <i class="fa-solid fa-unlock-keyhole" style="margin-right:6px;"></i>
+                Unlock
+            </button>
+
+            <div id="lock-error"></div>
+
+            <p style="color:#334155; font-size:0.72rem; margin-top:1.5rem;">
+                Need access? Contact Daniel to get this month's code.
+            </p>
+        </div>
+    </div>
+    <!-- ══ END LOCK SCREEN ══ -->
+
+
+    <!-- Navbar -->
+    <nav class="bg-slate-900 text-white shadow-lg sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="flex space-x-1">
+                        <div class="w-2 h-6 bg-ghana-red rounded-sm"></div>
+                        <div class="w-2 h-6 bg-ghana-yellow rounded-sm"></div>
+                        <div class="w-2 h-6 bg-ghana-green rounded-sm"></div>
+                    </div>
+                    <span class="font-bold text-lg tracking-tight">Lorry Bird Duty Calculator</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <label class="flex items-center gap-2 text-xs text-gray-400 hover:text-white cursor-pointer select-none transition-colors border-r border-gray-700 pr-4">
+                        <input type="checkbox" id="chk-show-url" class="rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-offset-slate-900 focus:ring-1" onchange="updatePrintSettings()">
+                        <span>Show URL in PDF</span>
+                    </label>
+                    <button onclick="window.print()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>Export PDF</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- Left Column -->
+        <div class="lg:col-span-4 space-y-6 no-print">
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1 flex overflow-x-auto gap-1">
+                <button id="btn-mode-cif" onclick="setMode('cif')" class="flex-1 py-2.5 text-xs sm:text-sm font-medium rounded-lg bg-slate-900 text-white shadow transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-calculator"></i> From CIF
+                </button>
+                <button id="btn-mode-hdv" onclick="setMode('hdv')" class="flex-1 py-2.5 text-xs sm:text-sm font-medium rounded-lg text-gray-500 hover:text-slate-900 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-ship"></i> From HDV
+                </button>
+                <button id="btn-mode-reverse" onclick="setMode('reverse')" class="flex-1 py-2.5 text-xs sm:text-sm font-medium rounded-lg text-gray-500 hover:text-slate-900 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-rotate-left"></i> Reverse
+                </button>
+                <button id="btn-mode-revdepr" onclick="setMode('revdepr')" class="flex-1 py-2.5 text-xs sm:text-sm font-medium rounded-lg text-gray-500 hover:text-slate-900 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-backward-step"></i> Find Depr.
+                </button>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div class="p-5 border-b border-gray-100 bg-gray-50">
+                    <h2 class="font-semibold text-gray-900">Vehicle Details</h2>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Vehicle Make & Model</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><i class="fa-solid fa-car"></i></span>
+                            <input type="text" id="input-car-name" oninput="updateCarName()" class="form-input block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="e.g. 2022 Honda Civic Sport">
+                        </div>
+                    </div>
+                    
+                    <hr class="border-gray-100">
+
+                    <div id="hdv-inputs" class="space-y-5 hidden">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">HDV (Foreign Currency)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-mono">$</span>
+                                <input type="number" id="input-hdv" oninput="calculate()" class="form-input block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 sm:text-sm font-mono" placeholder="25000">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide">Depreciation</label>
+                                <div class="flex items-center bg-blue-50 px-2 py-1 rounded text-blue-700 font-mono text-xs font-bold">
+                                    <span id="depreciation-display">0</span>%
+                                </div>
+                            </div>
+                            <input type="range" id="slider-depreciation" min="0" max="100" value="0" step="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="syncDepreciation(this.value)">
+                            <div class="mt-2 flex justify-end">
+                                <span class="text-xs text-gray-400 mr-2 self-center">Manual Adj:</span>
+                                <input type="number" id="input-depreciation" value="0" min="0" max="100" class="w-16 p-1 text-right border border-gray-300 rounded text-xs font-mono" oninput="syncDepreciation(this.value)">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Exchange Rate (GHS)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-mono">₵</span>
+                                <input type="number" id="input-ex-rate" oninput="calculate()" class="form-input block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 sm:text-sm font-mono" placeholder="15.50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="cif-inputs" class="space-y-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">CIF Value (GHS)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-mono">₵</span>
+                                <input type="number" id="input-cif" oninput="calculate()" class="form-input block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 sm:text-sm font-mono" placeholder="50000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="reverse-inputs" class="space-y-5 hidden">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Target Grand Total Tax (GHS)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-mono">₵</span>
+                                <input type="number" id="input-target-tax" oninput="calculate()" class="form-input block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 sm:text-sm font-mono" placeholder="100000">
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Enter the final tax amount to calculate the vehicle's required CIF value.</p>
+                        </div>
+                    </div>
+
+                    <div id="revdepr-inputs" class="space-y-5 hidden">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Target Grand Total Tax (GHS)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-mono">₵</span>
+                                <input type="number" id="input-revdepr-target" oninput="calculate()" class="form-input block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 sm:text-sm font-mono" placeholder="100000">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">HDV (Foreign Currency)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-mono">$</span>
+                                <input type="number" id="input-revdepr-hdv" oninput="calculate()" class="form-input block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 sm:text-sm font-mono" placeholder="25000">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Exchange Rate (GHS)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-mono">₵</span>
+                                <input type="number" id="input-revdepr-exrate" oninput="calculate()" class="form-input block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 sm:text-sm font-mono" placeholder="15.50">
+                            </div>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 flex justify-between items-center">
+                            <span class="text-xs text-blue-800 font-semibold uppercase tracking-wide">Required Depreciation:</span>
+                            <span id="calculated-depr-display" class="font-mono font-bold text-blue-700 text-lg">0.00%</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Import Duty Rate</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="relative">
+                                <input type="radio" name="duty_rate" value="0.05" class="peer sr-only" onchange="calculate()">
+                                <div class="flex items-center justify-center py-3 text-sm font-medium border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:bg-gray-50 transition-all">5%</div>
+                            </label>
+                            <label class="relative">
+                                <input type="radio" name="duty_rate" value="0.10" class="peer sr-only" onchange="calculate()">
+                                <div class="flex items-center justify-center py-3 text-sm font-medium border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:bg-gray-50 transition-all">10%</div>
+                            </label>
+                            <label class="relative">
+                                <input type="radio" name="duty_rate" value="0.20" class="peer sr-only" checked onchange="calculate()">
+                                <div class="flex items-center justify-center py-3 text-sm font-medium border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:bg-gray-50 transition-all">20%</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-5">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide">Overaged Penalty</label>
+                            <div class="flex items-center bg-red-50 px-2 py-1 rounded text-red-700 font-mono text-xs font-bold">
+                                <span id="penalty-display">0</span>%
+                            </div>
+                        </div>
+                        <input type="range" id="slider-penalty" min="0" max="100" value="0" step="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="syncPenalty(this.value)">
+                        <div class="mt-2 flex justify-end">
+                            <span class="text-xs text-gray-400 mr-2 self-center">Manual Adj:</span>
+                            <input type="number" id="input-penalty" value="0" min="0" max="100" class="w-16 p-1 text-right border border-gray-300 rounded text-xs font-mono" oninput="syncPenalty(this.value)">
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="resetCalculator()" class="w-full py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-arrows-rotate"></i> Reset Calculator
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-blue-600 text-white rounded-xl p-6 shadow-md">
+                <div class="flex items-start gap-4">
+                    <div class="bg-white/20 p-2 rounded-lg">
+                        <i class="fa-solid fa-lightbulb text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-1">Tip</h3>
+                        <p class="text-blue-100 text-sm leading-relaxed">Network charges are based on an FOB estimate (Calculated as CIF / 1.01697 in some models, or CIF × 0.98332 in others). This tool uses the standard 0.98332 factor.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="lg:col-span-8 print-container">
+            
+            <div class="print-only mb-6 border-b-2 border-black pb-4">
+                <div class="flex justify-between items-end">
+                    <div>
+                        <h1 class="text-3xl font-bold uppercase tracking-wide">Duty Assessment</h1>
+                        <p class="text-sm mt-1 font-medium text-gray-600" id="display-car-name">Detailed report</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-mono text-sm" id="print-date">Date: 29/01/2026</p>
+                        <p class="font-mono text-sm">Ref: LB-EST-2026</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 text-white rounded-2xl p-8 shadow-xl mb-6 relative overflow-hidden print-header-row">
+                <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                    <i class="fa-solid fa-coins text-9xl"></i>
+                </div>
+                <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1 print:text-black">Grand Total Tax Payable</p>
+                        <h2 class="text-4xl md:text-5xl font-bold font-mono tracking-tight print:text-black" id="total-display">GH₵0.00</h2>
+                    </div>
+                    <div class="flex flex-col justify-end items-start md:items-end">
+                        <div class="text-right">
+                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1 print:text-black">Assessed CIF Value</p>
+                            <p class="text-xl font-mono text-blue-300 print:text-black" id="cif-display">GH₵0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200">
+                                <th class="px-6 py-4 text-left font-semibold text-gray-600 uppercase tracking-wider text-xs">Description</th>
+                                <th class="px-6 py-4 text-right font-semibold text-gray-600 uppercase tracking-wider text-xs">Rate / Note</th>
+                                <th class="px-6 py-4 text-right font-semibold text-gray-600 uppercase tracking-wider text-xs">Amount (GHS)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tax-table-body" class="divide-y divide-gray-100">
+                            <tr>
+                                <td colspan="3" class="px-6 py-12 text-center text-gray-400">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <i class="fa-solid fa-calculator text-3xl opacity-50"></i>
+                                        <span>Enter vehicle value to calculate taxes</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-6 text-xs text-gray-400 text-center max-w-2xl mx-auto print:text-black">
+                <p>Disclaimer: This is an estimated assessment based on current public formulas. Actual port charges may vary due to several factors including exchange rate fluctuation.</p>
+            </div>
+            
+            <div class="print-only mt-12 border-t border-black pt-4 flex justify-between">
+                <div>
+                    <p class="text-xs">Authorized By:</p>
+                    <div class="h-8 border-b border-dotted border-black w-48 mt-4"></div>
+                </div>
+                <div>
+                    <p class="text-xs">Checked By:</p>
+                    <div class="h-8 border-b border-dotted border-black w-48 mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ══════════════════════════════════════════════════
+        //  🔐 MONTHLY PASSWORD — CHANGE THIS EACH MONTH
+        // ══════════════════════════════════════════════════
+        const MONTHLY_PASSWORD = "LorryBird-MAY2026";
+        // ══════════════════════════════════════════════════
+
+        function attemptUnlock() {
+            const input = document.getElementById('lock-input');
+            const errorEl = document.getElementById('lock-error');
+
+            if (input.value === MONTHLY_PASSWORD) {
+                document.getElementById('lock-screen').style.display = 'none';
+            } else {
+                input.classList.add('error');
+                errorEl.textContent = 'Incorrect code. Contact Daniel for access.';
+                input.value = '';
+                setTimeout(() => {
+                    input.classList.remove('error');
+                }, 600);
+            }
+        }
+
+        // Focus password input on load
+        window.addEventListener('load', () => {
+            document.getElementById('lock-input').focus();
+        });
+
+        // ── Calculator Logic ──
+
+        function updatePrintSettings() {
+            const showUrl = document.getElementById('chk-show-url').checked;
+            const styleEl = document.getElementById('dynamic-print-style');
+            if (showUrl) {
+                styleEl.innerHTML = `@media print { @page { margin: 1cm; size: A4; } body { padding: 0 !important; } }`;
+            } else {
+                styleEl.innerHTML = `@media print { @page { margin: 0; size: A4; } body { padding: 1.5cm !important; } }`;
+            }
+        }
+
+        let mode = 'cif';
+
+        const CONSTANTS = {
+            fobFactor: 0.98332,
+            rates: {
+                nhil: 0.025, getfund: 0.025, vat: 0.15,
+                ecowas: 0.005, exam: 0.01, wht: 0.01,
+                sil: 0.02, exim: 0.0075, au: 0.002,
+                cert: 0.005, network: 0.004
+            }
+        };
+
+        function setMode(newMode) {
+            mode = newMode;
+            const activeClass = "flex-1 py-2.5 text-xs sm:text-sm font-medium rounded-lg bg-slate-900 text-white shadow transition-all flex items-center justify-center gap-2 whitespace-nowrap";
+            const inactiveClass = "flex-1 py-2.5 text-xs sm:text-sm font-medium rounded-lg text-gray-500 hover:text-slate-900 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 whitespace-nowrap";
+            ['cif','hdv','reverse','revdepr'].forEach(m => {
+                document.getElementById(`btn-mode-${m}`).className = inactiveClass;
+                document.getElementById(`${m}-inputs`).classList.add('hidden');
+            });
+            document.getElementById(`btn-mode-${newMode}`).className = activeClass;
+            document.getElementById(`${newMode}-inputs`).classList.remove('hidden');
+            calculate();
+        }
+
+        function updateCarName() {
+            const val = document.getElementById('input-car-name').value;
+            document.getElementById('display-car-name').innerText = val ? val : "Detailed report";
+        }
+
+        function syncDepreciation(val) {
+            const clamped = Math.min(100, Math.max(0, parseInt(val) || 0));
+            document.getElementById('slider-depreciation').value = clamped;
+            document.getElementById('input-depreciation').value = clamped;
+            document.getElementById('depreciation-display').innerText = clamped;
+            calculate();
+        }
+
+        function syncPenalty(val) {
+            const clamped = Math.min(100, Math.max(0, parseInt(val) || 0));
+            document.getElementById('slider-penalty').value = clamped;
+            document.getElementById('input-penalty').value = clamped;
+            document.getElementById('penalty-display').innerText = clamped;
+            calculate();
+        }
+
+        function formatCurrency(num) {
+            return 'GH₵' + num.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function calculate() {
+            let cif = 0;
+            const dutyRate = parseFloat(document.querySelector('input[name="duty_rate"]:checked').value);
+            const penaltyRate = parseFloat(document.getElementById('input-penalty').value) || 0;
+            
+            if (mode === 'cif') {
+                cif = parseFloat(document.getElementById('input-cif').value) || 0;
+            } else if (mode === 'hdv') {
+                const hdv = parseFloat(document.getElementById('input-hdv').value) || 0;
+                const depRate = parseFloat(document.getElementById('input-depreciation').value) || 0;
+                const exRate = parseFloat(document.getElementById('input-ex-rate').value) || 0;
+                cif = hdv * (1 - (depRate / 100)) * exRate;
+            } else if (mode === 'reverse') {
+                const targetTax = parseFloat(document.getElementById('input-target-tax').value) || 0;
+                const factorGroup1 = dutyRate + ((1 + dutyRate) * 0.2075);
+                const factorGroup2 = 0.0595;
+                const factorGroup3 = CONSTANTS.fobFactor * CONSTANTS.rates.network * 1.2075;
+                const factorPenalty = penaltyRate / 100;
+                const totalFactor = factorGroup1 + factorGroup2 + factorGroup3 + factorPenalty;
+                if (targetTax > 0) cif = targetTax / totalFactor;
+            } else if (mode === 'revdepr') {
+                const targetTax = parseFloat(document.getElementById('input-revdepr-target').value) || 0;
+                const hdv = parseFloat(document.getElementById('input-revdepr-hdv').value) || 0;
+                const exRate = parseFloat(document.getElementById('input-revdepr-exrate').value) || 0;
+                const factorGroup1 = dutyRate + ((1 + dutyRate) * 0.2075);
+                const factorGroup2 = 0.0595;
+                const factorGroup3 = CONSTANTS.fobFactor * CONSTANTS.rates.network * 1.2075;
+                const factorPenalty = penaltyRate / 100;
+                const totalFactor = factorGroup1 + factorGroup2 + factorGroup3 + factorPenalty;
+                if (targetTax > 0) cif = targetTax / totalFactor;
+                if (hdv > 0 && exRate > 0 && cif > 0) {
+                    const reqDepr = (1 - ((cif / exRate) / hdv)) * 100;
+                    document.getElementById('calculated-depr-display').innerText = reqDepr.toFixed(2) + '%';
+                } else {
+                    document.getElementById('calculated-depr-display').innerText = '0.00%';
+                }
+            }
+
+            if (cif <= 0) {
+                document.getElementById('total-display').innerText = "GH₵0.00";
+                document.getElementById('cif-display').innerText = "GH₵0.00";
+                return;
+            }
+
+            const importDuty = cif * dutyRate;
+            const baseA = cif + importDuty;
+            const nhil = baseA * CONSTANTS.rates.nhil;
+            const getfund = baseA * CONSTANTS.rates.getfund;
+            const vatBase = baseA + nhil + getfund;
+            const vat = vatBase * CONSTANTS.rates.vat;
+            const ecowas = cif * CONSTANTS.rates.ecowas;
+            const exam = cif * CONSTANTS.rates.exam;
+            const wht = cif * CONSTANTS.rates.wht;
+            const sil = cif * CONSTANTS.rates.sil;
+            const exim = cif * CONSTANTS.rates.exim;
+            const au = cif * CONSTANTS.rates.au;
+            const cert = cif * CONSTANTS.rates.cert;
+            const fobEst = cif * CONSTANTS.fobFactor;
+            const netCharge = fobEst * CONSTANTS.rates.network;
+            const netNhil = netCharge * CONSTANTS.rates.nhil;
+            const netGetfund = netCharge * CONSTANTS.rates.getfund;
+            const netVatBase = netCharge + netNhil + netGetfund;
+            const netVat = netVatBase * CONSTANTS.rates.vat;
+            const overagePenalty = cif * (penaltyRate / 100);
+
+            const grandTotal = importDuty + nhil + getfund + vat +
+                               ecowas + exam + wht + sil + exim + au + cert +
+                               netCharge + netNhil + netGetfund + netVat + overagePenalty;
+
+            document.getElementById('total-display').innerText = formatCurrency(grandTotal);
+            document.getElementById('cif-display').innerText = formatCurrency(cif);
+
+            const rows = [
+                { name: "Import Duty", rate: `${(dutyRate*100).toFixed(0)}%`, amount: importDuty, bold: true },
+                { name: "NHIL", rate: "2.5%", amount: nhil },
+                { name: "GETFund Levy", rate: "2.5%", amount: getfund },
+                { name: "Import VAT", rate: "15%", amount: vat, bold: true },
+                { name: "ECOWAS Levy", rate: "0.5%", amount: ecowas },
+                { name: "Vehicle Examination Fee (Component 31)", rate: "1.0%", amount: exam },
+                { name: "Withholding Tax on Import", rate: "1.0%", amount: wht },
+                { name: "Special Import Levy", rate: "2.0%", amount: sil },
+                { name: "EXIM Levy", rate: "0.75%", amount: exim },
+                { name: "African Union Levy", rate: "0.2%", amount: au },
+                { name: "Vehicle Certification Fee (Component 16)", rate: "0.5%", amount: cert },
+                { name: "Network Charge", rate: "0.4% on FOB", amount: netCharge, spacer: true },
+                { name: "Network Charge NHIL", rate: "2.5%", amount: netNhil },
+                { name: "Network Charge GETFund", rate: "2.5%", amount: netGetfund },
+                { name: "Network Charge VAT", rate: "15%", amount: netVat },
+            ];
+
+            if (penaltyRate > 0) {
+                rows.push({ name: "Vehicle Overaged Penalty", rate: `${penaltyRate}%`, amount: overagePenalty, bold: true, spacer: true });
+            }
+
+            const tbody = document.getElementById('tax-table-body');
+            tbody.innerHTML = '';
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                if (row.spacer) tr.classList.add('border-t-2', 'border-gray-100');
+                tr.innerHTML = `
+                    <td class="px-6 py-3 text-gray-800 ${row.bold ? 'font-bold' : ''}">${row.name}</td>
+                    <td class="px-6 py-3 text-right text-gray-500 font-mono text-xs">${row.rate}</td>
+                    <td class="px-6 py-3 text-right font-mono ${row.bold ? 'font-bold text-gray-900' : 'text-gray-700'}">${formatCurrency(row.amount)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const totalTr = document.createElement('tr');
+            totalTr.className = "bg-gray-50 border-t-2 border-gray-900";
+            totalTr.innerHTML = `
+                <td class="px-6 py-4 font-bold text-gray-900">Total Payable</td>
+                <td class="px-6 py-4"></td>
+                <td class="px-6 py-4 text-right font-bold text-gray-900 font-mono text-lg">${formatCurrency(grandTotal)}</td>
+            `;
+            tbody.appendChild(totalTr);
+        }
+
+        function resetCalculator() {
+            ['input-cif','input-hdv','input-ex-rate','input-target-tax','input-car-name',
+             'input-revdepr-target','input-revdepr-hdv','input-revdepr-exrate'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('calculated-depr-display').innerText = '0.00%';
+            updateCarName();
+            syncDepreciation(0);
+            syncPenalty(0);
+            document.getElementById('tax-table-body').innerHTML = `
+                <tr><td colspan="3" class="px-6 py-12 text-center text-gray-400">
+                    <div class="flex flex-col items-center gap-3">
+                        <i class="fa-solid fa-calculator text-3xl opacity-50"></i>
+                        <span>Enter vehicle value to calculate taxes</span>
+                    </div>
+                </td></tr>`;
+            document.getElementById('total-display').innerText = "GH₵0.00";
+            document.getElementById('cif-display').innerText = "GH₵0.00";
+        }
+        
+        document.getElementById('print-date').innerText = "Date: " + new Date().toLocaleDateString('en-GB');
+    </script>
+</body>
+</html>
