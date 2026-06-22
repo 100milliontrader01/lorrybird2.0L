@@ -12,59 +12,39 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                        mono: ['Poppins', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Poppins','sans-serif'], mono: ['Poppins','sans-serif'] },
                     colors: {
-                        ghana: {
-                            red: '#CE1126',
-                            yellow: '#FCD116',
-                            green: '#006B3F',
-                            black: '#000000'
-                        },
-                        slate: {
-                            850: '#151f32',
-                            900: '#0f172a',
-                        }
+                        ghana: { red:'#CE1126', yellow:'#FCD116', green:'#006B3F', black:'#000000' },
+                        slate: { 850:'#151f32', 900:'#0f172a' }
                     }
                 }
             }
         }
     </script>
-    
+
     <style id="dynamic-print-style">
-        @media print { 
-            @page { margin: 0; size: A4; } 
-            body { padding: 1.5cm !important; }
-        }
+        @media print { @page { margin: 0; size: A4; } body { padding: 1.5cm !important; } }
     </style>
 
     <style>
         .form-input { transition: all 0.2s; }
-        .form-input:focus { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
-        
+        .form-input:focus { box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
         input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 20px; width: 20px;
-            border-radius: 50%; background: #2563eb; cursor: pointer;
-            margin-top: -8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); border: 2px solid white;
+            -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
+            background: #2563eb; cursor: pointer; margin-top: -8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2); border: 2px solid white;
         }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 4px; cursor: pointer;
-            background: #e2e8f0; border-radius: 2px;
+            width: 100%; height: 4px; cursor: pointer; background: #e2e8f0; border-radius: 2px;
         }
-
-        .bg-pattern {
-            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
+        .bg-pattern { background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
 
         @media print {
             body { background: white !important; color: black !important; font-size: 11pt; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
-            .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
+            .print-container { width:100%!important; margin:0!important; padding:0!important; box-shadow:none!important; border:none!important; }
             .print-header-row { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
             table { width: 100%; border-collapse: collapse; }
             th, td { border-bottom: 1px solid #ddd; padding: 8px 0; }
@@ -73,152 +53,69 @@
             .bg-slate-900 { background-color: transparent !important; color: black !important; border: 1px solid #000; }
             .text-white { color: black !important; }
             .bg-gray-50 { background-color: white !important; }
-            #lock-screen { display: none !important; }
+            #_ls { display: none !important; }
         }
         .print-only { display: none; }
 
-        /* ── Lock Screen ── */
-        #lock-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background: #0f172a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
+        /* Access Gate */
+        #_ls {
+            position: fixed; inset: 0; z-index: 9999; background: #0f172a;
+            display: flex; align-items: center; justify-content: center;
         }
-
-        #lock-screen .lock-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 1.25rem;
-            padding: 2.5rem 2rem;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
+        #_ls ._lc {
+            background: #1e293b; border: 1px solid #334155; border-radius: 1.25rem;
+            padding: 2.5rem 2rem; width: 100%; max-width: 400px; text-align: center;
             box-shadow: 0 25px 60px rgba(0,0,0,0.5);
         }
+        #_ls ._sb { display: flex; gap: 6px; justify-content: center; margin-bottom: 1.5rem; }
+        #_ls ._sb span { display: block; width: 10px; height: 32px; border-radius: 4px; }
+        #_ls input[type="password"] {
+            width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 0.6rem;
+            padding: 0.85rem 1rem; color: white; font-family: 'Poppins', sans-serif; font-size: 0.95rem;
+            outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+            text-align: center; letter-spacing: 0.1em; margin-bottom: 1rem;
+        }
+        #_ls input[type="password"]:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+        #_ls input[type="password"].err { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.2); animation: _shk 0.3s ease; }
+        #_ls ._ub {
+            width: 100%; background: #2563eb; color: white; border: none; border-radius: 0.6rem;
+            padding: 0.85rem; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 0.95rem;
+            cursor: pointer; transition: background 0.2s, transform 0.1s;
+        }
+        #_ls ._ub:hover { background: #1d4ed8; }
+        #_ls ._ub:active { transform: scale(0.98); }
+        #_le { color: #f87171; font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2rem; }
 
-        #lock-screen .stripe-bar {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-        }
-        #lock-screen .stripe-bar span {
-            display: block;
-            width: 10px;
-            height: 32px;
-            border-radius: 4px;
-        }
-
-        #lock-screen input[type="password"] {
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 0.6rem;
-            padding: 0.85rem 1rem;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            text-align: center;
-            letter-spacing: 0.1em;
-            margin-bottom: 1rem;
-        }
-        #lock-screen input[type="password"]:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
-        }
-        #lock-screen input[type="password"].error {
-            border-color: #ef4444;
-            box-shadow: 0 0 0 3px rgba(239,68,68,0.2);
-            animation: shake 0.3s ease;
-        }
-
-        #lock-screen button.unlock-btn {
-            width: 100%;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 0.6rem;
-            padding: 0.85rem;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-        #lock-screen button.unlock-btn:hover { background: #1d4ed8; }
-        #lock-screen button.unlock-btn:active { transform: scale(0.98); }
-
-        #lock-error {
-            color: #f87171;
-            font-size: 0.8rem;
-            margin-top: 0.75rem;
-            min-height: 1.2rem;
-        }
-
-        @keyframes shake {
-            0%,100% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
+        @keyframes _shk {
+            0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); }
         }
     </style>
 </head>
 <body class="bg-gray-100 text-slate-800 font-sans min-h-screen flex flex-col bg-pattern">
 
-    <!-- ══════════════════════════════════════
-         LOCK SCREEN
-         To change the password each month,
-         update the value of MONTHLY_PASSWORD below.
-    ══════════════════════════════════════ -->
-    <div id="lock-screen">
-        <div class="lock-card">
-            <!-- Ghana flag stripes -->
-            <div class="stripe-bar">
+    <!-- ACCESS GATE -->
+    <div id="_ls">
+        <div class="_lc">
+            <div class="_sb">
                 <span style="background:#CE1126"></span>
                 <span style="background:#FCD116"></span>
                 <span style="background:#006B3F"></span>
             </div>
-
-            <div style="color:#94a3b8; font-size:2.5rem; margin-bottom:0.5rem;">
+            <div style="color:#94a3b8;font-size:2.5rem;margin-bottom:0.5rem;">
                 <i class="fa-solid fa-lock"></i>
             </div>
-
-            <h1 style="color:white; font-size:1.25rem; font-weight:700; margin-bottom:0.25rem;">
-                Lorry Bird Calculator
-            </h1>
-            <p style="color:#64748b; font-size:0.82rem; margin-bottom:1.75rem;">
-                Enter your monthly access code to continue
-            </p>
-
-            <input
-                type="password"
-                id="lock-input"
-                placeholder="Access code"
-                onkeydown="if(event.key==='Enter') attemptUnlock()"
-                autocomplete="off"
-            />
-
-            <button class="unlock-btn" onclick="attemptUnlock()">
-                <i class="fa-solid fa-unlock-keyhole" style="margin-right:6px;"></i>
-                Unlock
+            <h1 style="color:white;font-size:1.25rem;font-weight:700;margin-bottom:0.25rem;">Lorry Bird Calculator</h1>
+            <p style="color:#64748b;font-size:0.82rem;margin-bottom:1.75rem;">Enter your monthly access code to continue</p>
+            <input type="password" id="_li" placeholder="Access code" onkeydown="if(event.key==='Enter')_au()" autocomplete="off"/>
+            <button class="_ub" onclick="_au()">
+                <i class="fa-solid fa-unlock-keyhole" style="margin-right:6px;"></i> Unlock
             </button>
-
-            <div id="lock-error"></div>
-
-            <p style="color:#334155; font-size:0.72rem; margin-top:1.5rem;">
-                Need access? Contact Daniel to get this month's code.
-            </p>
+            <div id="_le"></div>
+            <p style="color:#334155;font-size:0.72rem;margin-top:1.5rem;">Need access? Contact Daniel to get this month's code.</p>
         </div>
     </div>
-    <!-- ══ END LOCK SCREEN ══ -->
-
+    <!-- END ACCESS GATE -->
 
     <!-- Navbar -->
     <nav class="bg-slate-900 text-white shadow-lg sticky top-0 z-50 no-print">
@@ -238,8 +135,7 @@
                         <span>Show URL in PDF</span>
                     </label>
                     <button onclick="window.print()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium">
-                        <i class="fa-solid fa-file-pdf"></i>
-                        <span>Export PDF</span>
+                        <i class="fa-solid fa-file-pdf"></i><span>Export PDF</span>
                     </button>
                 </div>
             </div>
@@ -251,7 +147,6 @@
 
         <!-- Left Column -->
         <div class="lg:col-span-4 space-y-6 no-print">
-            
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1 flex overflow-x-auto gap-1">
                 <button id="btn-mode-cif" onclick="setMode('cif')" class="flex-1 py-2.5 text-xs sm:text-sm font-medium rounded-lg bg-slate-900 text-white shadow transition-all flex items-center justify-center gap-2 whitespace-nowrap">
                     <i class="fa-solid fa-calculator"></i> From CIF
@@ -271,7 +166,6 @@
                 <div class="p-5 border-b border-gray-100 bg-gray-50">
                     <h2 class="font-semibold text-gray-900">Vehicle Details</h2>
                 </div>
-                
                 <div class="p-6 space-y-6">
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Vehicle Make & Model</label>
@@ -280,7 +174,6 @@
                             <input type="text" id="input-car-name" oninput="updateCarName()" class="form-input block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="e.g. 2022 Honda Civic Sport">
                         </div>
                     </div>
-                    
                     <hr class="border-gray-100">
 
                     <div id="hdv-inputs" class="space-y-5 hidden">
@@ -294,9 +187,7 @@
                         <div>
                             <div class="flex justify-between items-center mb-2">
                                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide">Depreciation</label>
-                                <div class="flex items-center bg-blue-50 px-2 py-1 rounded text-blue-700 font-mono text-xs font-bold">
-                                    <span id="depreciation-display">0</span>%
-                                </div>
+                                <div class="flex items-center bg-blue-50 px-2 py-1 rounded text-blue-700 font-mono text-xs font-bold"><span id="depreciation-display">0</span>%</div>
                             </div>
                             <input type="range" id="slider-depreciation" min="0" max="100" value="0" step="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="syncDepreciation(this.value)">
                             <div class="mt-2 flex justify-end">
@@ -365,27 +256,16 @@
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Import Duty Rate</label>
                         <div class="grid grid-cols-3 gap-3">
-                            <label class="relative">
-                                <input type="radio" name="duty_rate" value="0.05" class="peer sr-only" onchange="calculate()">
-                                <div class="flex items-center justify-center py-3 text-sm font-medium border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:bg-gray-50 transition-all">5%</div>
-                            </label>
-                            <label class="relative">
-                                <input type="radio" name="duty_rate" value="0.10" class="peer sr-only" onchange="calculate()">
-                                <div class="flex items-center justify-center py-3 text-sm font-medium border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:bg-gray-50 transition-all">10%</div>
-                            </label>
-                            <label class="relative">
-                                <input type="radio" name="duty_rate" value="0.20" class="peer sr-only" checked onchange="calculate()">
-                                <div class="flex items-center justify-center py-3 text-sm font-medium border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:bg-gray-50 transition-all">20%</div>
-                            </label>
+                            <label class="relative"><input type="radio" name="duty_rate" value="0.05" class="peer sr-only" onchange="calculate()"><div class="flex items-center justify-center py-3 text-sm font-medium border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:bg-gray-50 transition-all">5%</div></label>
+                            <label class="relative"><input type="radio" name="duty_rate" value="0.10" class="peer sr-only" onchange="calculate()"><div class="flex items-center justify-center py-3 text-sm font-medium border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:bg-gray-50 transition-all">10%</div></label>
+                            <label class="relative"><input type="radio" name="duty_rate" value="0.20" class="peer sr-only" checked onchange="calculate()"><div class="flex items-center justify-center py-3 text-sm font-medium border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:bg-gray-50 transition-all">20%</div></label>
                         </div>
                     </div>
 
                     <div class="border-t border-gray-100 pt-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide">Overaged Penalty</label>
-                            <div class="flex items-center bg-red-50 px-2 py-1 rounded text-red-700 font-mono text-xs font-bold">
-                                <span id="penalty-display">0</span>%
-                            </div>
+                            <div class="flex items-center bg-red-50 px-2 py-1 rounded text-red-700 font-mono text-xs font-bold"><span id="penalty-display">0</span>%</div>
                         </div>
                         <input type="range" id="slider-penalty" min="0" max="100" value="0" step="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" oninput="syncPenalty(this.value)">
                         <div class="mt-2 flex justify-end">
@@ -401,12 +281,10 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="bg-blue-600 text-white rounded-xl p-6 shadow-md">
                 <div class="flex items-start gap-4">
-                    <div class="bg-white/20 p-2 rounded-lg">
-                        <i class="fa-solid fa-lightbulb text-xl"></i>
-                    </div>
+                    <div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-lightbulb text-xl"></i></div>
                     <div>
                         <h3 class="font-bold text-lg mb-1">Tip</h3>
                         <p class="text-blue-100 text-sm leading-relaxed">Network charges are based on an FOB estimate (Calculated as CIF / 1.01697 in some models, or CIF × 0.98332 in others). This tool uses the standard 0.98332 factor.</p>
@@ -417,7 +295,6 @@
 
         <!-- Right Column -->
         <div class="lg:col-span-8 print-container">
-            
             <div class="print-only mb-6 border-b-2 border-black pb-4">
                 <div class="flex justify-between items-end">
                     <div>
@@ -476,49 +353,40 @@
             <div class="mt-6 text-xs text-gray-400 text-center max-w-2xl mx-auto print:text-black">
                 <p>Disclaimer: This is an estimated assessment based on current public formulas. Actual port charges may vary due to several factors including exchange rate fluctuation.</p>
             </div>
-            
+
             <div class="print-only mt-12 border-t border-black pt-4 flex justify-between">
-                <div>
-                    <p class="text-xs">Authorized By:</p>
-                    <div class="h-8 border-b border-dotted border-black w-48 mt-4"></div>
-                </div>
-                <div>
-                    <p class="text-xs">Checked By:</p>
-                    <div class="h-8 border-b border-dotted border-black w-48 mt-4"></div>
-                </div>
+                <div><p class="text-xs">Authorized By:</p><div class="h-8 border-b border-dotted border-black w-48 mt-4"></div></div>
+                <div><p class="text-xs">Checked By:</p><div class="h-8 border-b border-dotted border-black w-48 mt-4"></div></div>
             </div>
         </div>
     </main>
 
     <script>
-        // ══════════════════════════════════════════════════
-        //  🔐 MONTHLY PASSWORD — CHANGE THIS EACH MONTH
-        // ══════════════════════════════════════════════════
-        const MONTHLY_PASSWORD = "LorryBird-MAY2026";
-        // ══════════════════════════════════════════════════
 
-        function attemptUnlock() {
-            const input = document.getElementById('lock-input');
-            const errorEl = document.getElementById('lock-error');
+ 
+        const _k = "9ca31f8887b92a27bcc4df7eef8788f71bd398e739c243f8732842e026c8fb8a";
 
-            if (input.value === MONTHLY_PASSWORD) {
-                document.getElementById('lock-screen').style.display = 'none';
+        async function _au() {
+            const _i = document.getElementById('_li');
+            const _e = document.getElementById('_le');
+            const _v = _i.value;
+            if (!_v) return;
+            const _b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(_v));
+            const _h = Array.from(new Uint8Array(_b)).map(x => x.toString(16).padStart(2,'0')).join('');
+            if (_h === _k) {
+                document.getElementById('_ls').style.display = 'none';
             } else {
-                input.classList.add('error');
-                errorEl.textContent = 'Incorrect code. Contact Daniel for access.';
-                input.value = '';
-                setTimeout(() => {
-                    input.classList.remove('error');
-                }, 600);
+                _i.classList.add('err');
+                _e.textContent = 'Incorrect code. Contact Daniel for access.';
+                _i.value = '';
+                setTimeout(() => _i.classList.remove('err'), 600);
             }
         }
 
-        // Focus password input on load
         window.addEventListener('load', () => {
-            document.getElementById('lock-input').focus();
+            document.getElementById('_li').focus();
+            document.getElementById('print-date').innerText = "Date: " + new Date().toLocaleDateString('en-GB');
         });
-
-        // ── Calculator Logic ──
 
         function updatePrintSettings() {
             const showUrl = document.getElementById('chk-show-url').checked;
@@ -584,7 +452,7 @@
             let cif = 0;
             const dutyRate = parseFloat(document.querySelector('input[name="duty_rate"]:checked').value);
             const penaltyRate = parseFloat(document.getElementById('input-penalty').value) || 0;
-            
+
             if (mode === 'cif') {
                 cif = parseFloat(document.getElementById('input-cif').value) || 0;
             } else if (mode === 'hdv') {
@@ -644,7 +512,6 @@
             const netVatBase = netCharge + netNhil + netGetfund;
             const netVat = netVatBase * CONSTANTS.rates.vat;
             const overagePenalty = cif * (penaltyRate / 100);
-
             const grandTotal = importDuty + nhil + getfund + vat +
                                ecowas + exam + wht + sil + exim + au + cert +
                                netCharge + netNhil + netGetfund + netVat + overagePenalty;
@@ -669,10 +536,7 @@
                 { name: "Network Charge GETFund", rate: "2.5%", amount: netGetfund },
                 { name: "Network Charge VAT", rate: "15%", amount: netVat },
             ];
-
-            if (penaltyRate > 0) {
-                rows.push({ name: "Vehicle Overaged Penalty", rate: `${penaltyRate}%`, amount: overagePenalty, bold: true, spacer: true });
-            }
+            if (penaltyRate > 0) rows.push({ name: "Vehicle Overaged Penalty", rate: `${penaltyRate}%`, amount: overagePenalty, bold: true, spacer: true });
 
             const tbody = document.getElementById('tax-table-body');
             tbody.innerHTML = '';
@@ -686,7 +550,6 @@
                 `;
                 tbody.appendChild(tr);
             });
-
             const totalTr = document.createElement('tr');
             totalTr.className = "bg-gray-50 border-t-2 border-gray-900";
             totalTr.innerHTML = `
@@ -703,9 +566,7 @@
                 document.getElementById(id).value = '';
             });
             document.getElementById('calculated-depr-display').innerText = '0.00%';
-            updateCarName();
-            syncDepreciation(0);
-            syncPenalty(0);
+            updateCarName(); syncDepreciation(0); syncPenalty(0);
             document.getElementById('tax-table-body').innerHTML = `
                 <tr><td colspan="3" class="px-6 py-12 text-center text-gray-400">
                     <div class="flex flex-col items-center gap-3">
@@ -716,8 +577,7 @@
             document.getElementById('total-display').innerText = "GH₵0.00";
             document.getElementById('cif-display').innerText = "GH₵0.00";
         }
-        
-        document.getElementById('print-date').innerText = "Date: " + new Date().toLocaleDateString('en-GB');
+
     </script>
 </body>
 </html>
